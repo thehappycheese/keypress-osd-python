@@ -4,4 +4,6 @@ A basic window that shows the keys you are currently pressing (even without focu
 
 Intended to work with screen recording software such as OBS.
 
-Requires python to be installed, depends on `keyboard`. Tested with Python 3.9.1.
+Requires python to be installed, depends on `keyboard`. Tested with Python 3.9.1 on windows.
+
+![Demo](/readme_extras/demo.mp4)

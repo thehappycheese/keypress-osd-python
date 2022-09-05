@@ -1,9 +1,10 @@
 import tkinter as tk
-import keyboard  
-from keyboard._winkeyboard import official_virtual_keys
+from keyboard import KeyboardEvent
 import threading
 import time
 from util import Grip, Keyboard_Listener
+
+
 
 root = tk.Tk()
 root.geometry("400x46")
@@ -38,7 +39,7 @@ def thread_output_display():
         time.sleep(0.1)
         keyboard_listener.cleanup_old_resolved_events()
         
-        events:list[tuple[str,keyboard.KeyboardEvent]] = [
+        events:list[tuple[str, KeyboardEvent]] = [
             *[
                 ("unresolved", item)
                 for item
@@ -58,15 +59,12 @@ def thread_output_display():
             pass
         else:
             for (item_type, item) in events:
-                ff = keyboard._canonical_names
                 if item_type == "unresolved":
                     text_out.insert("end", " " + item.name, ("active",))
                 else:
                     text_out.insert("end", " " + item.name, ("inactive",))
         text_out.config(state=tk.DISABLED)
-        
 
-# test another test how about no
 threading.Thread(
     target=thread_output_display,
     daemon=True
