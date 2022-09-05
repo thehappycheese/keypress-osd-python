@@ -1,60 +1,76 @@
-from telnetlib import STATUS
+import tkinter as tk
 import keyboard  
+from keyboard._winkeyboard import official_virtual_keys
 import threading
 import time
-import tkinter as tk
 from util import Grip, Keyboard_Listener
 
-
 root = tk.Tk()
-root.geometry("400x50")
+root.geometry("400x46")
 root.resizable(False, False)
 root.overrideredirect(True)
 root.attributes("-topmost", True)
 root.bind('<Double-Button-1>', lambda event: exit())
 
+text_out  = tk.Text(
+    root,
+    fg="#EEEEEE",
+    bg="#222222",
+    font=("Arial", 20),
+    relief="flat",
+    padx=5,
+    pady=5,
+    cursor="arrow",
+    state=tk.DISABLED
+)
 
-stringvar = tk.StringVar()
-stringvar.set("...")
-text_out  = tk.Label(root, textvariable=stringvar, fg="#EEEEEE", bg="#222222", font=("Arial", 15))
 text_out.pack(fill=tk.BOTH, expand=1)
+text_out.tag_configure("inactive", foreground="#EEEEEE", justify=tk.CENTER)
+text_out.tag_configure("active", foreground="red", justify=tk.CENTER)
 
 
 grip = Grip(root)
 
+keyboard_listener = Keyboard_Listener()    
 
-keyboard_listener = Keyboard_Listener()
-    
-
-def thread_output_display(stringvar:tk.StringVar):
+def thread_output_display():
     while True:
         time.sleep(0.1)
         keyboard_listener.cleanup_old_resolved_events()
-        #resolved   = keyboard_listener.get_resolved_output()
-        #unresolved = keyboard_listener.get_unresolved_output()
-        # stringvar.set(
-            # f"{resolved} {unresolved}"
-        # )
-        events = [
-            *keyboard_listener.unresolved_events.values(),
+        
+        events:list[tuple[str,keyboard.KeyboardEvent]] = [
             *[
-                downstroke 
+                ("unresolved", item)
+                for item
+                in keyboard_listener.unresolved_events.values()
+            ],
+            *[
+                ("resolved", downstroke)
                 for downstroke, upstroke
                 in keyboard_listener.resolved_events
             ]
         ]
-        events.sort(key=lambda item:item.time)
-        
-        stringvar.set(
-            " ".join(item.name for item in events)
-        )
+        events.sort(key=lambda item:item[1].time)
+        text_out.config(state=tk.NORMAL)
+        text_out.delete(0.0,"end")
+        if len(events)==0:
+            #text_out.insert("end","...")
+            pass
+        else:
+            for (item_type, item) in events:
+                ff = keyboard._canonical_names
+                if item_type == "unresolved":
+                    text_out.insert("end", " " + item.name, ("active",))
+                else:
+                    text_out.insert("end", " " + item.name, ("inactive",))
+        text_out.config(state=tk.DISABLED)
         
 
-
+# test another test how about no
 threading.Thread(
     target=thread_output_display,
-    args=(stringvar, ),
     daemon=True
 ).start()
+
 
 root.mainloop()

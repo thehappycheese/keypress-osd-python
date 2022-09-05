@@ -28,7 +28,7 @@ class Keyboard_Listener:
             )
 
     def process_event(self, new_event:KeyboardEvent):
-        print(new_event.name, new_event.modifiers, new_event.scan_code)
+        #print(new_event.name, new_event.scan_code)
         # on up-stroke try find a corresponding down-stroke
         if new_event.event_type == "up":
             if new_event.scan_code in self.unresolved_events:
@@ -58,6 +58,6 @@ class Keyboard_Listener:
             (downstroke, upstroke)
             for downstroke, upstroke 
             in self.resolved_events
-            if now()-upstroke.time<2.0
+            if now()-upstroke.time<1.0
         ]
 # keyboard
